@@ -21,6 +21,7 @@ const scoreTable = {
     "Нийтийн тээвэр": 5,
     "Машин": 1,
   },
+
   distance: {
     "5-с бага минут": 10,
     "5–15 минут": 10,
@@ -35,6 +36,7 @@ const questionTemplates = [
     title: "Хамгийн сүүлд үйлчлүүлсэн газар",
     options: serviceOptions,
   },
+
   {
     type: "transport",
     title: "Сүүлд үйлчлүүлсэн газар руу юугаар явж хүрсэн бэ?",
@@ -45,6 +47,7 @@ const questionTemplates = [
       "Машин",
     ],
   },
+
   {
     type: "distance",
     title: "Хэр хугацаа зарцуулж хүрсэн бэ?",
@@ -55,6 +58,7 @@ const questionTemplates = [
       "30-с дээш минут",
     ],
   },
+
   {
     type: "reason",
     title: "Яагаад энэ газрыг сонгож үйлчлүүлсэн бэ?",
@@ -83,22 +87,28 @@ function calculateScore(answers) {
   const serviceScores = services.map((service, index) => {
     const serviceNumber = index + 1;
 
-    const transportAnswer = answers[`service_${serviceNumber}_transport`];
-    const distanceAnswer = answers[`service_${serviceNumber}_distance`];
+    const transportAnswer =
+      answers[`service_${serviceNumber}_transport`];
 
-    const transportScore = scoreTable.transport[transportAnswer] || 0;
-    const distanceScore = scoreTable.distance[distanceAnswer] || 0;
+    const distanceAnswer =
+      answers[`service_${serviceNumber}_distance`];
 
-    const totalScore = transportScore + distanceScore;
+    const transportScore =
+      scoreTable.transport[transportAnswer] || 0;
+
+    const distanceScore =
+      scoreTable.distance[distanceAnswer] || 0;
+
+    const totalScore =
+      transportScore + distanceScore;
+
     const maxScore = 20;
-    const percent = totalScore / maxScore;
+
+    const percent =
+      totalScore / maxScore;
 
     return {
       service,
-      transportAnswer,
-      distanceAnswer,
-      transportScore,
-      distanceScore,
       totalScore,
       maxScore,
       percent,
@@ -106,8 +116,10 @@ function calculateScore(answers) {
   });
 
   const proximityScore =
-    serviceScores.reduce((sum, item) => sum + item.percent, 0) /
-    serviceScores.length;
+    serviceScores.reduce(
+      (sum, item) => sum + item.percent,
+      0
+    ) / serviceScores.length;
 
   return {
     serviceScores,
@@ -120,11 +132,19 @@ function formatPercent(value) {
 }
 
 export default function App() {
+
   const [step, setStep] = useState(-1);
+
   const [answers, setAnswers] = useState({});
-  const [finished, setFinished] = useState(false);
+
+  const [finished, setFinished] =
+    useState(false);
 
   const currentQuestion = questions[step];
+
+  /*
+    START
+  */
 
   const startQuiz = () => {
     setStep(0);
@@ -132,9 +152,41 @@ export default function App() {
     setFinished(false);
   };
 
+  /*
+    BACK BUTTON
+  */
+
+  const goBack = () => {
+
+    if (finished) {
+      setFinished(false);
+      setStep(questions.length - 1);
+      return;
+    }
+
+    if (step > 0) {
+      setStep(step - 1);
+    }
+
+    else {
+      setStep(-1);
+    }
+  };
+
+  /*
+    SAVE
+  */
+
+    
   const saveResult = (finalAnswers) => {
-    const score = calculateScore(finalAnswers);
-    const oldResults = JSON.parse(localStorage.getItem("quizResults")) || [];
+
+    const score =
+      calculateScore(finalAnswers);
+
+    const oldResults =
+      JSON.parse(
+        localStorage.getItem("quizResults")
+      ) || [];
 
     const newResult = {
       id: Date.now(),
@@ -150,7 +202,12 @@ export default function App() {
     );
   };
 
+  /*
+    ANSWER SELECT
+  */
+
   const selectAnswer = (answer) => {
+
     const updatedAnswers = {
       ...answers,
       [currentQuestion.key]: answer,
@@ -160,111 +217,243 @@ export default function App() {
 
     if (step < questions.length - 1) {
       setStep(step + 1);
-    } else {
+    }
+
+    else {
       saveResult(updatedAnswers);
       setFinished(true);
     }
   };
 
+  /*
+    HOME PAGE
+  */
+
   if (step === -1) {
+
     return (
       <main className="container">
-        <section className="card">
-          <p className="eyebrow">Судалгааны quiz app</p>
 
-          <h1>Өдөр тутмын үйлчилгээний хүртээмжийн судалгаа</h1>
+        <section className="card">
+
+          <p className="eyebrow">
+            Судалгааны Quiz App
+          </p>
+
+          <h1>
+            Өдөр тутмын үйлчилгээний
+            хүртээмжийн судалгаа
+          </h1>
 
           <p className="description">
-            Та хамгийн сүүлд үйлчлүүлсэн 3 газрынхаа тухай хариулна.
-            Тээврийн хэрэгсэл болон хугацааны сонголтоор оноо тооцож,
-            эцэст нь Proximity Score гаргана.
+
+            Та хамгийн сүүлд
+            үйлчлүүлсэн 3 газрынхаа
+            тухай хариулна.
+
+            Тээврийн хэрэгсэл болон
+            хугацааны сонголтоор
+            оноо тооцож,
+            эцэст нь Proximity Score
+            гаргана.
+
           </p>
 
           <p className="notice">
-            Таны хариултыг зөвхөн судалгааны зорилгоор ашиглана.
+            Таны хариултыг зөвхөн
+            судалгааны зорилгоор ашиглана.
           </p>
 
-          <button onClick={startQuiz}>Эхлэх →</button>
+          <button onClick={startQuiz}>
+            Эхлэх →
+          </button>
+
         </section>
+
       </main>
     );
   }
 
+  /*
+    RESULT PAGE
+  */
+
   if (finished) {
-    const result = calculateScore(answers);
+
+    const result =
+      calculateScore(answers);
 
     return (
       <main className="container">
+
         <section className="card">
-          <p className="eyebrow">Үр дүн</p>
+
+          <p className="eyebrow">
+            Үр дүн
+          </p>
+
+          <button
+            className="back-btn"
+            onClick={goBack}
+          >
+            ← Буцах
+          </button>
 
           <h1>Баярлалаа!</h1>
 
           <div className="result-table">
+
             <div className="table-row table-head">
+
               <span></span>
-              <span>Авсан оноо</span>
-              <span>Нийт оноо</span>
-              <span>Хувь</span>
+
+              <span>
+                Авсан оноо
+              </span>
+
+              <span>
+                Нийт оноо
+              </span>
+
+              <span>
+                Хувь
+              </span>
+
             </div>
 
             {result.serviceScores.map((item) => (
-              <div className="table-row" key={item.service}>
-                <span>{item.service}</span>
-                <span>{item.totalScore}</span>
-                <span>{item.maxScore}</span>
-                <span>{item.percent.toFixed(2)}</span>
+
+              <div
+                className="table-row"
+                key={item.service}
+              >
+
+                <span>
+                  {item.service}
+                </span>
+
+                <span>
+                  {item.totalScore}
+                </span>
+
+                <span>
+                  {item.maxScore}
+                </span>
+
+                <span>
+                  {item.percent.toFixed(2)}
+                </span>
+
               </div>
+
             ))}
 
             <div className="table-row final-row">
-              <span>Proximity Score</span>
+
+              <span>
+                Proximity Score
+              </span>
+
               <span></span>
+
               <span></span>
-              <span>{formatPercent(result.proximityScore)}</span>
+
+              <span>
+                {formatPercent(
+                  result.proximityScore
+                )}
+              </span>
+
             </div>
+
           </div>
 
-          <button onClick={startQuiz}>Дахин бөглөх</button>
+          <button onClick={startQuiz}>
+            Дахин бөглөх
+          </button>
+
         </section>
+
       </main>
     );
   }
 
+  /*
+    QUESTION PAGE
+  */
+
   return (
+
     <main className="container">
+
       <section className="card">
+
         <div className="top-info">
-          <span>{currentQuestion.service} / 3</span>
-          <span>Алхам {currentQuestion.questionIndex + 1} / 4</span>
+
+          <span>
+            {currentQuestion.service} / 3
+          </span>
+
+          <span>
+            Алхам {currentQuestion.questionIndex + 1} / 4
+          </span>
+
         </div>
 
-        <h2>{currentQuestion.title}</h2>
+        <button
+          className="back-btn"
+          onClick={goBack}
+        >
+          ← Буцах
+        </button>
+
+        <h2>
+          {currentQuestion.title}
+        </h2>
 
         <div className="options">
+
           {currentQuestion.options.map((option) => (
+
             <button
               key={option}
               className="option-btn"
-              onClick={() => selectAnswer(option)}
+              onClick={() =>
+                selectAnswer(option)
+              }
             >
               {option}
             </button>
+
           ))}
+
         </div>
 
         <div className="selected-services">
-          <p>Your selected services</p>
+
+          <p>
+            Selected Services
+          </p>
+
           {services.map((service, index) => (
+
             <span
               key={service}
-              className={index === currentQuestion.serviceIndex ? "active" : ""}
+              className={
+                index === currentQuestion.serviceIndex
+                  ? "active"
+                  : ""
+              }
             >
               {service}
             </span>
+
           ))}
+
         </div>
+
       </section>
+
     </main>
   );
 }
