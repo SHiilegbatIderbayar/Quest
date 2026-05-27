@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap");
 
 * {
   box-sizing: border-box;
@@ -17,7 +17,7 @@
   --accent-soft: rgba(15, 118, 110, 0.12);
   --cream: #fffaf3;
 
-  font-family: "Inter", system-ui, sans-serif;
+  font-family: "Montserrat", system-ui, sans-serif;
   color: var(--text);
   background: var(--bg-1);
 }
